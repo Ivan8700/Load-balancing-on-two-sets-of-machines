@@ -2,12 +2,16 @@
 from random import randint
 from math import ceil
 class RunAlgorithm(object):
-    """ This class will contain the schedule on both of the sets"""
+    """ This class will be the basic guidelines for running the algorithm
+        Can also be used to give specific rules of algorithm run in the constructor of the class"""
     
-    #Receiving the input from the user
-    def __init__(self,print_option):
+    
+    def __init__(self):
+        """ Receives the input for the algorithm, assigns id for each job.
+            Runs the algorithm and then prints the output """
+        
+        
         self.cnt_amount_of_moves=0
-        self.print_option=print_option
         self.list_of_jobs=[]
         input_option=int(input("Enter how would you like to receive the input? 0 - .txt file, 1 - manual insertion, 2 - randomization : "))
         if(input_option==0):
@@ -51,6 +55,12 @@ class RunAlgorithm(object):
     #Scheduling the jobs on the machines using the greedy algorithm - for each job, take the minimal cost of scheduling between the sets, then schedule it on the minimal machine at that set.
     #if both values are equal, preferablly schedule the job on the second set (the bigger set)
     def greedy_algorithm(self):
+        """Used to assign the initalization of the jobs on the machines
+            It schedules jobs on the machines by a greedy algorithm, as follows :
+            for each job, take it's minimal cost of scheduling between the sets, then schedule the job on the minimal machine in that set
+            if both values are equal, preferablly schedule the job on the second set (the set with more machines)
+            for example : job with [2,3] (2 for the first set and 3 for the second set)  - the algorithm will schedule the job in the first set in the minimal load machine
+            for a job with [2,2] - the algorithm will schedule the job in the machine with the least load from both sets"""
         for key,value in self.list_of_jobs.items():
             min_val=float('inf')
             min_index=0
@@ -88,6 +98,7 @@ class RunAlgorithm(object):
             
 
     def local_search(self):
+        """Basics of the searching steps, Works as default local-search heuristic"""
         moving_job_bool=True
         switching_jobs_bool=True
         while(moving_job_bool or switching_jobs_bool):
@@ -126,16 +137,17 @@ class RunAlgorithm(object):
                 for y in range(0,3*self.parameter):
                     maximum_between_the_machines=max(self.summation_of_both_sets[x],self.summation_of_both_sets[y])
                     where_is_x = 0 if (x<self.parameter) else 1
-                    where_is_y= 0 if (y<self.parameter) else 1
-                    for key2,value_of_y in self.schedule_on_both_sets[y].items():
-                        if(x!=y and (self.summation_of_both_sets[x]-value[where_is_x]+value_of_y[where_is_x] < maximum_between_the_machines) and (self.summation_of_both_sets[y]+value[where_is_y]-value_of_y[where_is_y]<maximum_between_the_machines)):
-                            self.summation_of_both_sets[x]+= (value_of_y[where_is_x]-value[where_is_x])
-                            self.summation_of_both_sets[y]+= (value[where_is_y]-value_of_y[where_is_y])
-                            self.schedule_on_both_sets[x][key2]=value_of_y
-                            self.schedule_on_both_sets[y][key]=value
-                            del self.schedule_on_both_sets[x][key]
-                            del self.schedule_on_both_sets[y][key2]
-                            return True
+                    where_is_y = 0 if (y<self.parameter) else 1
+                    if(x!=y):
+                        for key2,value_of_y in self.schedule_on_both_sets[y].items():
+                            if((self.summation_of_both_sets[x]-value[where_is_x]+value_of_y[where_is_x] < maximum_between_the_machines) and (self.summation_of_both_sets[y]+value[where_is_y]-value_of_y[where_is_y]<maximum_between_the_machines)):
+                                self.summation_of_both_sets[x]+= (value_of_y[where_is_x]-value[where_is_x])
+                                self.summation_of_both_sets[y]+= (value[where_is_y]-value_of_y[where_is_y])
+                                self.schedule_on_both_sets[x][key2]=value_of_y
+                                self.schedule_on_both_sets[y][key]=value
+                                del self.schedule_on_both_sets[x][key]
+                                del self.schedule_on_both_sets[y][key2]
+                                return True
         return False
                         
                     
@@ -155,7 +167,7 @@ class RunAlgorithm(object):
                 maximum_value_on_sets=self.summation_of_both_sets[x]
         print("Total amount of moves is " + str(self.cnt_amount_of_moves))
         print("The makespan is " + str(maximum_value_on_sets))
-        print("OPT is bound by " + str(ceil(sum/(3*self.parameter))))
+        print("OPT is bound by at least " + str(ceil(sum/(3*self.parameter))))
         
         
 
